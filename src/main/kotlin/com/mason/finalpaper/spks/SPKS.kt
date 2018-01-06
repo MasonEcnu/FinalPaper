@@ -26,9 +26,7 @@ class SPKS : BasicScheme {
     }
   }
 
-  override fun setup(): Param {
-    return Param(pairing)
-  }
+  override fun setup(): Param = Param(pairing)
 
   override fun keyGen(param: Param): KeyPair {
     val sk = param.Zr.newRandomElement()
