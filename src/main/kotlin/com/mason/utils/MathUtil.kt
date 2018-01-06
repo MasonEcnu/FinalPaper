@@ -27,9 +27,12 @@ class MathUtil {
     /**
      * 计算log以2为底的对数
      */
-    fun log2(n: Int): Int {
-      return (Math.log(n.toDouble()) / Math.log(2.toDouble())).toInt()
-    }
+    fun log2(n: Int): Int = (Math.log(n.toDouble()) / Math.log(2.toDouble())).toInt()
+
+    /**
+     * 计算任意底的对数值
+     */
+    fun log(value: Float, base: Float): Float = (Math.log(value.toDouble()) / Math.log(base.toDouble())).toFloat()
   }
 }
 
