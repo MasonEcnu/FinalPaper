@@ -1,4 +1,4 @@
-package com.mason.finalpaper.models
+package com.mason.basic.models
 
 import it.unisa.dia.gas.jpbc.Pairing
 

@@ -1,4 +1,4 @@
-package com.mason.finalpaper.spks.data
+package com.mason.basic.spks.data
 
 val Msg2Word = mapOf<String, List<String>>(
     "Message of document 1" to mutableListOf("cat", "hat", "mat"),

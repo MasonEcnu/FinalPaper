@@ -1,11 +1,11 @@
-package com.mason.finalpaper.spchs
+package com.mason.basic.spchs
 
-import com.mason.finalpaper.models.KeyPair
-import com.mason.finalpaper.models.Param
-import com.mason.finalpaper.models.SpchsCipher
-import com.mason.finalpaper.models.Structure
-import com.mason.finalpaper.spchs.basic.BasicScheme
-import com.mason.finalpaper.spchs.data.Word2Doc
+import com.mason.basic.models.KeyPair
+import com.mason.basic.models.Param
+import com.mason.basic.models.SpchsCipher
+import com.mason.basic.models.Structure
+import com.mason.basic.spchs.basic.BasicScheme
+import com.mason.basic.spchs.data.Word2Doc
 import com.mason.utils.HashUtil
 import it.unisa.dia.gas.jpbc.Element
 import it.unisa.dia.gas.jpbc.Pairing
@@ -140,7 +140,6 @@ fun main(args: Array<String>) {
   var end: Long
   println("开始！")
   // 关键字列表
-  start = System.currentTimeMillis()
   val spchs = SPCHS()
   // 系统初始化
   start = System.currentTimeMillis()

@@ -1,4 +1,4 @@
-package com.mason.finalpaper.ibe;
+package com.mason.ibe;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
@@ -42,7 +42,7 @@ public class BasicIdent implements Ident {
   /**
    * 判断配对是否为对称配对，不对称则输出错误信息
    *
-   * @param pairing
+   * @param pairing 配对变量
    */
   private void checkSymmetric(Pairing pairing) {
     if (!pairing.isSymmetric()) {

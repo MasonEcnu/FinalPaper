@@ -1,4 +1,4 @@
-package com.mason.finalpaper.hash;
+package com.mason.hash;
 
 import java.util.Arrays;
 
@@ -153,9 +153,9 @@ public final class MurmurHash3 {
     int pos = offset;
     int end = offset + len;
     int k1 = 0;
-    int k2 = 0;
+    int k2;
     int shift = 0;
-    int bits = 0;
+    int bits;
     int nBytes = 0;   // length in UTF8 bytes
 
 
@@ -165,7 +165,7 @@ public final class MurmurHash3 {
         k2 = code;
         bits = 8;
 
-        /***
+        /*
          // optimized ascii implementation (currently slower!!! code size?)
          if (shift == 24) {
          k1 = k1 | (code << 24);

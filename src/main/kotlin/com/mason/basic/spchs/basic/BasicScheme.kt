@@ -1,6 +1,6 @@
-package com.mason.finalpaper.spchs.basic
+package com.mason.basic.spchs.basic
 
-import com.mason.finalpaper.models.*
+import com.mason.basic.models.*
 import it.unisa.dia.gas.jpbc.Element
 
 interface BasicScheme {

@@ -1,4 +1,4 @@
-package com.mason.finalpaper.utils;
+package com.mason.utils;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.mason.finalpaper.ibe;
+package com.mason.ibe;
 
 public interface Ident {
   void buildSystem();

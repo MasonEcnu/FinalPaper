@@ -1,4 +1,4 @@
-package com.mason.finalpaper.ibe;
+package com.mason.ibe;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

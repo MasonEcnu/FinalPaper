@@ -1,10 +1,8 @@
-package com.mason.finalpaper.spks
+package com.mason.basic.spks
 
-import com.mason.finalpaper.models.KeyPair
-import com.mason.finalpaper.models.Param
-import com.mason.finalpaper.models.SpksCipher
-import com.mason.finalpaper.spks.basic.BasicScheme
-import com.mason.finalpaper.spks.data.Msg2Word
+import com.mason.basic.models.*
+import com.mason.basic.spks.basic.BasicScheme
+import com.mason.basic.spks.data.Msg2Word
 import com.mason.proxy.TimeCountProxyHandle
 import com.mason.utils.HashUtil
 import com.mason.utils.MathUtil

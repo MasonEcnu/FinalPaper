@@ -1,6 +1,6 @@
 package com.mason.utils
 
-import com.mason.finalpaper.hash.MurmurHash3
+import com.mason.hash.MurmurHash3
 import java.util.*
 
 class HashUtil {

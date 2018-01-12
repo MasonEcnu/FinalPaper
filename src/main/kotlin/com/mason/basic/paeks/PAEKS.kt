@@ -1,9 +1,7 @@
-package com.mason.finalpaper.paeks
+package com.mason.basic.paeks
 
-import com.mason.finalpaper.paeks.basic.BasicScheme
-import com.mason.finalpaper.models.KeyPair
-import com.mason.finalpaper.models.PaeksCipher
-import com.mason.finalpaper.models.Param
+import com.mason.basic.paeks.basic.BasicScheme
+import com.mason.basic.models.*
 import com.mason.utils.StringUtil
 import it.unisa.dia.gas.jpbc.Element
 import it.unisa.dia.gas.jpbc.Pairing
@@ -129,7 +127,7 @@ fun main(args: Array<String>) {
   println("服务器预处理完毕： ${end - start}ms")
   // 查询目标
   val scan = Scanner(System.`in`)
-  var aim = ""
+  var aim: String
   println("是否应用预处理？Y/N: ")
   while (scan.hasNext()) {
     aim = scan.next()
@@ -143,7 +141,7 @@ fun main(args: Array<String>) {
     start = System.currentTimeMillis()
     if (paeks.isPreprocess) {
       preprocessed.let {
-        it?.forEach {
+        it.forEach {
           if (Tw.isEqual(it)) {
             println("Bingo!")
             return@let

@@ -1,8 +1,6 @@
-package com.mason.finalpaper.paeks.basic
+package com.mason.basic.paeks.basic
 
-import com.mason.finalpaper.models.KeyPair
-import com.mason.finalpaper.models.PaeksCipher
-import com.mason.finalpaper.models.Param
+import com.mason.basic.models.*
 import it.unisa.dia.gas.jpbc.Element
 
 interface BasicScheme {

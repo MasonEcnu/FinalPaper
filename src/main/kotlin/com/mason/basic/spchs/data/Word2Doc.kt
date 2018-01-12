@@ -1,4 +1,4 @@
-package com.mason.finalpaper.spchs.data
+package com.mason.basic.spchs.data
 
 val Word2Doc = mapOf<String, List<String>>(
     "cat" to mutableListOf("doc1", "doc3", "doc5"),
