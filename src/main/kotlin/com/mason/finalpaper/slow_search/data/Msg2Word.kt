@@ -12,3 +12,16 @@ val Msg2Word = mapOf<String, List<String>>(
     "doc9" to arrayListOf("hammer", "hug"),
     "doc10" to arrayListOf("like", "truth", "banana")
 )
+
+val Documents = mapOf<String, String>(
+    "doc1" to "I have a white cat.",
+    "doc2" to "I have a black hat.",
+    "doc3" to "I like eat fruit.",
+    "doc4" to "I live in China.",
+    "doc5" to "I just went to bar once.",
+    "doc6" to "I read many books last year.",
+    "doc7" to "I love money.",
+    "doc8" to "The shape of the Earth is a ball.",
+    "doc9" to "I like cartoon of Japan.",
+    "doc10" to "The Earth is our home."
+)

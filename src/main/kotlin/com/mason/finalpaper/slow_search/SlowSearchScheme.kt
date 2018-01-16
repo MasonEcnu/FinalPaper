@@ -1,7 +1,9 @@
 package com.mason.finalpaper.slow_search
 
+import com.mason.constants.MAX_FILE_LENGTH
 import com.mason.models.*
 import com.mason.finalpaper.slow_search.basic.BasicScheme
+import com.mason.finalpaper.slow_search.data.Documents
 import com.mason.finalpaper.slow_search.data.Msg2Word
 import com.mason.utils.HashUtil
 import com.mason.utils.MathUtil
@@ -31,26 +33,28 @@ class SlowSearchScheme : BasicScheme {
     return KeyPair(sk, pk)
   }
 
-  override fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): SlowDocCipher {
-    val msg_binary = StringUtil.hex2Binary(StringUtil.str2Hex(doc))
-    // 二进制数的长度
-    val n = doc.length * 8
-    // 1. 计算u1
-    val u1 = param.g.duplicate().powZn(r)
-    // 2.计算u2
-    val rho = StringUtil.randomBinaryString(n_rho)
-    val h5_in = pairing.pairing(pk_do, pk_csp).duplicate().powZn(r)
-    val h5_hash = HashUtil.toBinaryString(HashUtil.hash32(h5_in.toString()))
-    val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
-    val u2 = MathUtil.xor(rho, h5)
-    // 3.计算u3
-    val h3_rho = param.G1.newElementFromHash(rho.toByteArray(), 0, n_rho)
-    val h4_in = pairing.pairing(h3_rho, pk_du.duplicate().powZn(r))
-    val h4_hash = HashUtil.toBinaryString(HashUtil.hash32(h4_in.toString()))
-    val h4 = StringUtil.randomBinaryString(h4_hash, n)
-    val u3 = MathUtil.xor(msg_binary, h4)
-    // 4.计算cm
-    return SlowDocCipher(u1, u2, u3)
+  override fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher> {
+    val docs = StringUtil.padding(doc)
+    val results = mutableListOf<SlowDocCipher>()
+    docs.forEach {
+      // 1. 计算u1
+      val u1 = param.g.duplicate().powZn(r)
+      // 2.计算u2
+      val rho = StringUtil.randomBinaryString(n_rho)
+      val h5_in = pairing.pairing(pk_do, pk_csp).duplicate().powZn(r)
+      val h5_hash = HashUtil.hash64(h5_in.toString()).toString()
+      val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
+      val u2 = MathUtil.xor(rho, h5)
+      // 3.计算u3
+      val h3_rho = param.G1.newElementFromHash(rho.toByteArray(), 0, n_rho)
+      val h4_in = pairing.pairing(h3_rho, pk_du.duplicate().powZn(r))
+      val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
+      val h4 = StringUtil.randomBinaryString(h4_hash, MAX_FILE_LENGTH)
+      val u3 = MathUtil.xor(it, h4)
+      // 4.计算cm
+      results.add(SlowDocCipher(u1, u2, u3, param.G1.newZeroElement()))
+    }
+    return results
   }
 
   override fun indexGen(word: String, sk_do: Element, pk_du: Element, r: Element, param: Param): SlowWordCipher {
@@ -72,7 +76,7 @@ class SlowSearchScheme : BasicScheme {
         keywords.add(indexGen(it, sk_do, pk_du, r_word, param))
       }
       val r_doc = param.Zr.newRandomElement()
-      results.add(SlowMsg2CSP(msgEnc(it, pk_do, pk_du, pk_csp, r_doc, param), keywords, param.G1.newZeroElement()))
+      results.add(SlowMsg2CSP(msgEnc(Documents[it] ?: "", pk_do, pk_du, pk_csp, r_doc, param), keywords))
     }
     return results
   }
@@ -101,13 +105,15 @@ class SlowSearchScheme : BasicScheme {
 
   override fun preDec(pk_do: Element, sk_csp: Element, ciphers: List<SlowMsg2CSP>, param: Param): List<SlowMsg2CSP> {
     ciphers.forEach {
-      val h5_in = pairing.pairing(pk_do, it.cm.u1).duplicate().powZn(sk_csp)
-      val h5_hash = HashUtil.toBinaryString(HashUtil.hash32(h5_in.toString()))
-      val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
-      val rho = MathUtil.xor(it.cm.u2, h5)
-      val rho_bytes = rho.toByteArray()
-      val h3_rho = param.G1.newElementFromHash(rho_bytes, 0, rho_bytes.size)
-      it.crho = pairing.pairing(h3_rho, it.cm.u1)
+      it.cm.forEach {
+        val h5_in = pairing.pairing(pk_do, it.u1).duplicate().powZn(sk_csp)
+        val h5_hash = HashUtil.hash64(h5_in.toString()).toString()
+        val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
+        val rho = MathUtil.xor(it.u2, h5)
+        val rho_bytes = rho.toByteArray()
+        val h3_rho = param.G1.newElementFromHash(rho_bytes, 0, rho_bytes.size)
+        it.crho = pairing.pairing(h3_rho, it.u1)
+      }
     }
     return ciphers
   }
@@ -115,10 +121,12 @@ class SlowSearchScheme : BasicScheme {
   override fun recovery(ciphers: List<SlowMsg2CSP>, sk_du: Element, param: Param): List<String> {
     val results = mutableListOf<String>()
     ciphers.forEach {
-      val h4_in = it.crho.duplicate().powZn(sk_du)
-      val h4_hash = HashUtil.toBinaryString(HashUtil.hash32(h4_in.toString()))
-      val h4 = StringUtil.randomBinaryString(h4_hash, it.cm.u3.length)
-      results.add(MathUtil.xor(h4, it.cm.u3))
+      it.cm.forEach {
+        val h4_in = it.crho.duplicate().powZn(sk_du)
+        val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
+        val h4 = StringUtil.randomBinaryString(h4_hash, it.u3.length)
+        results.add(MathUtil.xor(h4, it.u3))
+      }
     }
     return results
   }
@@ -179,7 +187,7 @@ fun main(args: Array<String>) {
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
     results.forEach {
-      println(StringUtil.hex2Str(StringUtil.binary2Hex(it)))
+      println(it)
     }
     println("输入目标关键词: ")
   }

@@ -8,7 +8,7 @@ interface BasicScheme {
 
   fun keyGen(param: Param): KeyPair
 
-  fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): SlowDocCipher
+  fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher>
 
   fun indexGen(word: String, sk_do: Element, pk_du: Element, r: Element, param: Param): SlowWordCipher
 

@@ -3,8 +3,7 @@ package com.mason.finalpaper.fast_search
 import com.mason.constants.MAX_FILE_LENGTH
 import com.mason.constants.PRIME_LENGTH
 import com.mason.finalpaper.fast_search.basic.BasicScheme
-import com.mason.finalpaper.fast_search.data.Word2Doc
-import com.mason.finalpaper.fast_search.data.docs
+import com.mason.finalpaper.fast_search.data.*
 import com.mason.models.*
 import com.mason.utils.HashUtil
 import com.mason.utils.MathUtil
@@ -236,7 +235,7 @@ fun main(args: Array<String>) {
   println("结构初始化完毕： ${end - start}ms")
   // 加密明文和关键字
   start = System.currentTimeMillis()
-  val ciphers = fast.enc(docs, Word2Doc, owner.sk, owner.pk, user.pk, csp.pk, structure, param)
+  val ciphers = fast.enc(Documents, Word2Doc, owner.sk, owner.pk, user.pk, csp.pk, structure, param)
   end = System.currentTimeMillis()
   println("加密完毕： ${end - start}ms")
   // 查询目标
