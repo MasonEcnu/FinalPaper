@@ -1,5 +1,7 @@
 package com.mason.utils
 
+import kotlin.experimental.xor
+
 class MathUtil {
   companion object {
     /**
@@ -12,16 +14,18 @@ class MathUtil {
     }
 
     /**
-     * 计算给定两个二进制字符串的亦或结果
+     * 计算两字符串异或
      */
     fun xor(s1: String, s2: String): String {
       if (s1.length != s2.length) return ""
-      val len = s1.length
-      val sb = StringBuilder()
+      val cs1 = s1.toCharArray()
+      val cs2 = s2.toCharArray()
+      val len = cs1.size
+      val cs = CharArray(len)
       (0 until len).forEach {
-        sb.append(s1[it].toInt() xor s2[it].toInt())
+        cs[it] = (cs1[it].toInt() xor cs2[it].toInt()).toChar()
       }
-      return sb.toString()
+      return String(cs)
     }
 
     /**
@@ -37,5 +41,9 @@ class MathUtil {
 }
 
 fun main(args: Array<String>) {
-  println("010011010110010101110011011100110110000101100111011001010010000001101111011001100010000001100100011011110110001101110101011011010110010101101110011101000010000000110001".length)
+  val s1 = "hell,1"
+  val s2 = "world2"
+  val cs = MathUtil.xor(s1, s2)
+  val result = MathUtil.xor(cs, s2)
+  println(result)
 }

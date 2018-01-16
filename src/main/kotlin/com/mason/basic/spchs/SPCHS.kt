@@ -1,9 +1,6 @@
 package com.mason.basic.spchs
 
-import com.mason.basic.models.KeyPair
-import com.mason.basic.models.Param
-import com.mason.basic.models.SpchsCipher
-import com.mason.basic.models.Structure
+import com.mason.models.*
 import com.mason.basic.spchs.basic.BasicScheme
 import com.mason.basic.spchs.data.Word2Doc
 import com.mason.utils.HashUtil

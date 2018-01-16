@@ -1,7 +1,7 @@
 package com.mason.basic.paeks
 
 import com.mason.basic.paeks.basic.BasicScheme
-import com.mason.basic.models.*
+import com.mason.models.*
 import com.mason.utils.StringUtil
 import it.unisa.dia.gas.jpbc.Element
 import it.unisa.dia.gas.jpbc.Pairing

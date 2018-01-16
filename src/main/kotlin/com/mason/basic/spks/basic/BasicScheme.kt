@@ -1,6 +1,6 @@
 package com.mason.basic.spks.basic
 
-import com.mason.basic.models.*
+import com.mason.models.*
 import it.unisa.dia.gas.jpbc.Element
 
 interface BasicScheme {

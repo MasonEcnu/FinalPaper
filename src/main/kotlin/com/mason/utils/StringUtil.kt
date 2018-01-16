@@ -85,7 +85,7 @@ class StringUtil {
 
     /**
      * 转化十六进制串为字符串
-     * @param str
+     * @param hex
      * @return
      */
     fun hex2Str(hex: String): String {
@@ -102,7 +102,7 @@ class StringUtil {
 
     /**
      * 转化十六进制串为二进制
-     * @param str
+     * @param hex
      * @return
      */
     fun hex2Binary(hex: String): String {
@@ -187,7 +187,7 @@ class StringUtil {
     }
 
     /**
-     * 根据已有二进制串生成指定位数的二进制串
+     * 根据已有字符串生成指定长度的字符串
      */
     fun randomBinaryString(source: String, n: Int): String {
       val len = source.length

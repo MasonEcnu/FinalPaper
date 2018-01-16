@@ -1,6 +1,6 @@
 package com.mason.basic.spks
 
-import com.mason.basic.models.*
+import com.mason.models.*
 import com.mason.basic.spks.basic.BasicScheme
 import com.mason.basic.spks.data.Msg2Word
 import com.mason.proxy.TimeCountProxyHandle

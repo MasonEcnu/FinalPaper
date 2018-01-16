@@ -16,7 +16,10 @@ const val AES_PADDING = "AES/CBC/PKCS5Padding"
 const val CHARS = " !\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 const val CHARS_LENGTH = CHARS.length
 // 最大文件长度
-const val MAX_FILE_LENGTH = 10
+const val MAX_FILE_LENGTH = 50
+
+// 素数p的位数
+const val PRIME_LENGTH = 512
 
 // 读取文件方式枚举
 enum class FolderType {
