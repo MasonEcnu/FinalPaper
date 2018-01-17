@@ -2,6 +2,7 @@ package com.mason.finalpaper.fast_search
 
 import com.mason.constants.MAX_FILE_LENGTH
 import com.mason.constants.PRIME_LENGTH
+import com.mason.constants.STOP_CHARACTER
 import com.mason.finalpaper.fast_search.basic.BasicScheme
 import com.mason.finalpaper.fast_search.data.*
 import com.mason.models.*
@@ -43,7 +44,7 @@ class FastSearchScheme : BasicScheme {
       val content = docs[it]
       if (content != null) {
         val docCiphers = mutableListOf<FastDocCipher>()
-        val docLists = StringUtil.padding(content)
+        val docLists = StringUtil.padding(content + STOP_CHARACTER)
         docLists.forEach {
           val r = param.Zr.newRandomElement()
           // 1. 计算u1
@@ -144,28 +145,55 @@ class FastSearchScheme : BasicScheme {
 
   // 检索
   override fun search(pk_du: Element, pk_do: Element, pk_st: Element, ciphers: FastCipher2CSP, tw: Element, param: Param): Map<String, List<FastDocCipher>> {
+//    val results = mutableMapOf<String, List<FastDocCipher>>()
+//    var pt = pairing.pairing(pk_st, pk_du).duplicate().mul(tw)
+//    var pt_hash = HashUtil.hash64(pt.toString())
+//    val index_map = ciphers.wordCiphers[pk_do]
+//    val cipher_map = ciphers.docCiphers
+//    if (index_map != null) {
+//      while (index_map.containsKey(pt_hash)) {
+//        val index = index_map[pt_hash]
+//        if (index != null) {
+//          val cipher = cipher_map[index.doc]
+//          if (cipher != null) {
+//            results.put(index.doc, cipher)
+//            pt = index.third.duplicate().div(pairing.pairing(index.second, param.g).duplicate().mul(tw))
+//            pt_hash = HashUtil.hash64(pt.toString())
+//          }
+//        }
+//      }
+//    }
+//    return results
+
     val results = mutableMapOf<String, List<FastDocCipher>>()
     var pt = pairing.pairing(pk_st, pk_du).duplicate().mul(tw)
-    var pt_hash = HashUtil.hash64(pt.toString())
     val index_map = ciphers.wordCiphers[pk_do]
     val cipher_map = ciphers.docCiphers
+    var flag = true
+    var timer = 0
     if (index_map != null) {
-      while (true) {
-        if (index_map.containsKey(pt_hash)) {
-          val index = index_map[pt_hash]
-          if (index != null) {
-            val cipher = cipher_map[index.doc]
-            if (cipher != null) {
-              results.put(index.doc, cipher)
-              pt = index.third.duplicate().div(pairing.pairing(index.second, param.g).duplicate().mul(tw))
-              pt_hash = HashUtil.hash64(pt.toString())
+      val indexLists = index_map.values.toList()
+      while (flag) {
+        timer++
+        indexLists.run {
+          forEach {
+            val record = it
+            if (pt.isEqual(record.first)) {
+              val cipher = cipher_map[record.doc]
+              if (cipher != null) {
+                results.put(record.doc, cipher)
+                pt = record.third.duplicate().div(pairing.pairing(record.second, param.g).duplicate().mul(tw))
+                return@run
+              }
+            } else if (indexOf(record) == size - 1) {
+              flag = false
+              return@run
             }
           }
-        } else {
-          break
         }
       }
     }
+//    println(timer)
     return results
   }
 
@@ -189,17 +217,19 @@ class FastSearchScheme : BasicScheme {
   }
 
   // 恢复明文
-  override fun recovery(ciphers: Map<String, List<FastDocCipher>>, sk_du: Element, param: Param): List<String> {
-    val results = mutableListOf<String>()
+  override fun recovery(ciphers: Map<String, List<FastDocCipher>>, sk_du: Element, param: Param): Map<String, String> {
+    val results = mutableMapOf<String, String>()
     ciphers.keys.forEach {
       val cipher = ciphers[it]
+      val sb = StringBuilder()
       if (cipher != null) {
         cipher.forEach {
           val h4_in = it.crho.duplicate().powZn(sk_du)
           val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
           val h4 = StringUtil.randomBinaryString(h4_hash, it.cm.third.length)
-          results.add(MathUtil.xor(h4, it.cm.third))
+          sb.append(MathUtil.xor(h4, it.cm.third))
         }
+        results.put(it, sb.toString())
       }
     }
     return results
@@ -266,8 +296,8 @@ fun main(args: Array<String>) {
     end = System.currentTimeMillis()
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
-    results.forEach {
-      println(it)
+    results.forEach { key, value ->
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER))}")
     }
     println("输入目标关键词: ")
   }

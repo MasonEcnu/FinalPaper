@@ -5,6 +5,7 @@ import com.mason.constants.CHARS_LENGTH
 import com.mason.constants.MAX_FILE_LENGTH
 import com.mason.constants.SEPARATOR
 import java.util.*
+import java.util.regex.Pattern
 
 class StringUtil {
   companion object {
@@ -203,26 +204,18 @@ class StringUtil {
         }
       }
     }
+
+    // 判断一个字符串是否为纯数字
+    fun isNumeric(str: String): Boolean {
+      val pattern = Pattern.compile("-?[0-9]+\\.?[0-9]*")
+      val isNum = pattern.matcher(str)
+      return isNum.matches()
+    }
   }
 }
 
 fun main(args: Array<String>) {
-  println(StringUtil.randomBinaryString("10", 5))
-
-//  val start = System.currentTimeMillis()
-//  val msg = "Life doesn't always give us the joys we want. We don't always get our hopes and dreams, and we don't always get our own way. But do not give up hope, because you can make a difference one situation and one person at a time."
-//  // 计算msg的二进制字符串
-//  val msg_binary = StringUtil.hex2Binary(StringUtil.str2Hex(msg))
-//  val h4 = StringUtil.randomBinaryString(msg_binary.length)
-//  val u3 = MathUtil.xor(msg_binary, h4)
-//  println("msg: $msg")
-//  println("msg_binary: $msg_binary")
-//  println("h4: $h4")
-//  println("u3: $u3")
-//  val _msg_binary = MathUtil.xor(u3, h4)
-//  println("_msg_binary: $_msg_binary")
-//  val _msg = StringUtil.hex2Str(StringUtil.binary2Hex(_msg_binary))
-//  println("_msg: $_msg")
-//  val end = System.currentTimeMillis()
-//  println("cost: ${end - start}ms")
+  StringUtil.padding("haksodhkaoskdoaskodaksdjk").forEach {
+    println(it)
+  }
 }

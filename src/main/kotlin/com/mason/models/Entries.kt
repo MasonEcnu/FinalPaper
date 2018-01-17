@@ -18,7 +18,7 @@ data class KeywordNode(val keyword: String, val idf: Double)
 /**
  * 方案2：部分解密+抵抗内部关键字攻击+正向索引
  */
-data class SlowDocCipher(val u1: Element, val u2: String, val u3: String, var crho: Element)
+data class SlowDocCipher(val doc_id: String, val u1: Element, val u2: String, val u3: String, var crho: Element)
 
 data class SlowWordCipher(val first: Element, val second: Element)
 

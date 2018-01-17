@@ -1,6 +1,7 @@
 package com.mason.finalpaper.slow_search
 
 import com.mason.constants.MAX_FILE_LENGTH
+import com.mason.constants.STOP_CHARACTER
 import com.mason.models.*
 import com.mason.finalpaper.slow_search.basic.BasicScheme
 import com.mason.finalpaper.slow_search.data.Documents
@@ -33,8 +34,8 @@ class SlowSearchScheme : BasicScheme {
     return KeyPair(sk, pk)
   }
 
-  override fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher> {
-    val docs = StringUtil.padding(doc)
+  override fun msgEnc(doc_id: String, doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher> {
+    val docs = StringUtil.padding(doc + STOP_CHARACTER)
     val results = mutableListOf<SlowDocCipher>()
     docs.forEach {
       // 1. 计算u1
@@ -52,7 +53,7 @@ class SlowSearchScheme : BasicScheme {
       val h4 = StringUtil.randomBinaryString(h4_hash, MAX_FILE_LENGTH)
       val u3 = MathUtil.xor(it, h4)
       // 4.计算cm
-      results.add(SlowDocCipher(u1, u2, u3, param.G1.newZeroElement()))
+      results.add(SlowDocCipher(doc_id, u1, u2, u3, param.G1.newZeroElement()))
     }
     return results
   }
@@ -76,7 +77,7 @@ class SlowSearchScheme : BasicScheme {
         keywords.add(indexGen(it, sk_do, pk_du, r_word, param))
       }
       val r_doc = param.Zr.newRandomElement()
-      results.add(SlowMsg2CSP(msgEnc(Documents[it] ?: "", pk_do, pk_du, pk_csp, r_doc, param), keywords))
+      results.add(SlowMsg2CSP(msgEnc(it, Documents[it] ?: "", pk_do, pk_du, pk_csp, r_doc, param), keywords))
     }
     return results
   }
@@ -118,15 +119,19 @@ class SlowSearchScheme : BasicScheme {
     return ciphers
   }
 
-  override fun recovery(ciphers: List<SlowMsg2CSP>, sk_du: Element, param: Param): List<String> {
-    val results = mutableListOf<String>()
+  override fun recovery(ciphers: List<SlowMsg2CSP>, sk_du: Element, param: Param): Map<String, String> {
+    val results = mutableMapOf<String, String>()
+    var doc_name = ""
     ciphers.forEach {
+      val sb = StringBuilder()
       it.cm.forEach {
+        doc_name = it.doc_id
         val h4_in = it.crho.duplicate().powZn(sk_du)
         val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
         val h4 = StringUtil.randomBinaryString(h4_hash, it.u3.length)
-        results.add(MathUtil.xor(h4, it.u3))
+        sb.append(MathUtil.xor(h4, it.u3))
       }
+      results.put(doc_name, sb.toString())
     }
     return results
   }
@@ -186,8 +191,8 @@ fun main(args: Array<String>) {
     end = System.currentTimeMillis()
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
-    results.forEach {
-      println(it)
+    results.forEach { key, value ->
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER))}")
     }
     println("输入目标关键词: ")
   }

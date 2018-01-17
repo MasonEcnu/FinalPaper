@@ -1,7 +1,8 @@
-package com.mason.utils
+package com.mason.discarded
 
 import com.mason.constants.*
 import com.mason.models.MyFile
+import com.mason.discarded.DiscardedFileUtil
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
@@ -31,7 +32,7 @@ class CryptoUtil {
           kg.init(KEY_SIZE, SecureRandom(KEY_BYTES))
           val sk = kg.generateKey()
           val content = String(Base64.getEncoder().encode(sk.encoded))
-          FileUtil.writeFile(AES_KEY_PATH, MyFile(content = mutableListOf(content)), FolderType.KEY)
+          DiscardedFileUtil.writeFile(AES_KEY_PATH, MyFile(content = mutableListOf(content)), FolderType.KEY)
         }
       }
     }
@@ -40,7 +41,7 @@ class CryptoUtil {
      * 恢复AES密钥
      */
     private fun recoverAESKey(): SecretKey {
-      val keyStr = FileUtil.readFolderOrFile(AES_KEY_PATH, FolderType.KEY).first().content.first()
+      val keyStr = DiscardedFileUtil.readFolderOrFile(AES_KEY_PATH, FolderType.KEY).first().content.first()
       val keyBytes = Base64.getDecoder().decode(keyStr)
       return SecretKeySpec(keyBytes, KEY_ALGORITHM)
     }
@@ -53,14 +54,14 @@ class CryptoUtil {
       val cipher = Cipher.getInstance(AES_PADDING)
       cipher.init(Cipher.ENCRYPT_MODE, sk, IvParameterSpec(IV_BYTES))
       val plaintextFiles = mutableListOf<MyFile>()
-      FileUtil.readFolderOrFile(sourceFolder, FolderType.ENCRYPTED).forEach {
+      DiscardedFileUtil.readFolderOrFile(sourceFolder, FolderType.ENCRYPTED).forEach {
         val contents = it.content
         contents.indices.forEach {
           contents[it] = String(Base64.getEncoder().encode(cipher.doFinal(contents[it].toByteArray())))
         }
         plaintextFiles.add(it)
       }
-      FileUtil.writeFiles(aimFolder, plaintextFiles, FolderType.ENCRYPTED)
+      DiscardedFileUtil.writeFiles(aimFolder, plaintextFiles, FolderType.ENCRYPTED)
     }
 
     /**
@@ -71,14 +72,14 @@ class CryptoUtil {
       val cipher = Cipher.getInstance(AES_PADDING)
       cipher.init(Cipher.DECRYPT_MODE, sk, IvParameterSpec(IV_BYTES))
       val encryptedFiles = mutableListOf<MyFile>()
-      FileUtil.readFolderOrFile(sourceFolder, FolderType.DECRYPTED).forEach {
+      DiscardedFileUtil.readFolderOrFile(sourceFolder, FolderType.DECRYPTED).forEach {
         val contents = it.content
         contents.indices.forEach {
           contents[it] = String((cipher.doFinal(Base64.getDecoder().decode(contents[it]))))
         }
         encryptedFiles.add(it)
       }
-      FileUtil.writeFiles(aimFolder, encryptedFiles, FolderType.DECRYPTED)
+      DiscardedFileUtil.writeFiles(aimFolder, encryptedFiles, FolderType.DECRYPTED)
     }
   }
 }

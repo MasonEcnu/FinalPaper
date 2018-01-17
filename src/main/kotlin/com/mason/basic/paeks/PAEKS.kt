@@ -23,9 +23,7 @@ class PAEKS : BasicScheme {
   /**
    * 系统初始化
    */
-  override fun setup(): Param {
-    return Param(pairing)
-  }
+  override fun setup(): Param = Param(pairing)
 
   /**
    * 密钥对生成
@@ -93,9 +91,9 @@ fun main(args: Array<String>) {
   // 关键字列表
   start = System.currentTimeMillis()
   val words = mutableListOf<String>()
-  (0 until 1000).forEach {
+  (0 until 100).forEach {
     words.add(StringUtil.genRandomString(5))
-    if (it % 100 == 0) println(words[it])
+    if (it % 10 == 0) println(words[it])
   }
   end = System.currentTimeMillis()
   println("关键字初始化完毕： ${end - start}ms")

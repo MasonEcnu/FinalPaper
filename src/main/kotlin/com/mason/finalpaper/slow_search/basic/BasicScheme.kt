@@ -8,7 +8,7 @@ interface BasicScheme {
 
   fun keyGen(param: Param): KeyPair
 
-  fun msgEnc(doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher>
+  fun msgEnc(doc_id: String, doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher>
 
   fun indexGen(word: String, sk_do: Element, pk_du: Element, r: Element, param: Param): SlowWordCipher
 
@@ -21,5 +21,5 @@ interface BasicScheme {
 
   fun preDec(pk_do: Element, sk_csp: Element, ciphers: List<SlowMsg2CSP>, param: Param): List<SlowMsg2CSP>
 
-  fun recovery(ciphers: List<SlowMsg2CSP>, sk_du: Element, param: Param): List<String>
+  fun recovery(ciphers: List<SlowMsg2CSP>, sk_du: Element, param: Param): Map<String, String>
 }

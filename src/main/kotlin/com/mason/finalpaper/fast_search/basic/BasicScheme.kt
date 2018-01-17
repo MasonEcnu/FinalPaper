@@ -22,5 +22,5 @@ interface BasicScheme {
 
   fun preDec(pk_do: Element, sk_csp: Element, ciphers: Map<String, List<FastDocCipher>>, param: Param): Map<String, List<FastDocCipher>>
 
-  fun recovery(ciphers: Map<String, List<FastDocCipher>>, sk_du: Element, param: Param): List<String>
+  fun recovery(ciphers: Map<String, List<FastDocCipher>>, sk_du: Element, param: Param): Map<String, String>
 }
