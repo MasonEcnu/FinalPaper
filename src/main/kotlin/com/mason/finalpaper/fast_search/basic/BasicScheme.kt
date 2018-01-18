@@ -14,7 +14,7 @@ interface BasicScheme {
 
   fun strucEnc(words: Map<String, List<String>>, sk_do: Element, pk_du: Element, structure: Structure, param: Param): MutableMap<Long, FastIndexCipher>
 
-  fun enc(docs: Map<String, String>, words: Map<String, List<String>>, sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element,structure: Structure, param: Param): FastCipher2CSP
+  fun enc(sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, structure: Structure, param: Param): FastCipher2CSP
 
   fun trapdoor(word: String, sk_du: Element, pk_do: Element, param: Param): Element
 

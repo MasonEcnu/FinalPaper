@@ -13,7 +13,7 @@ interface BasicScheme {
   fun indexGen(word: String, sk_do: Element, pk_du: Element, r: Element, param: Param): SlowWordCipher
 
   // 此方法调用msgEnc和indexGen以生成最后的密文
-  fun enc(docs: Map<String, List<String>>, sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, param: Param): List<SlowMsg2CSP>
+  fun enc(sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, param: Param): List<SlowMsg2CSP>
 
   fun trapdoor(word: String, sk_du: Element, pk_do: Element, param: Param): Element
 

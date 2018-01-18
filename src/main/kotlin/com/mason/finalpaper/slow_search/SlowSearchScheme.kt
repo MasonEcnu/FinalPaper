@@ -4,8 +4,7 @@ import com.mason.constants.MAX_FILE_LENGTH
 import com.mason.constants.STOP_CHARACTER
 import com.mason.models.*
 import com.mason.finalpaper.slow_search.basic.BasicScheme
-import com.mason.finalpaper.slow_search.data.Documents
-import com.mason.finalpaper.slow_search.data.Msg2Word
+import com.mason.finalpaper.slow_search.data.SlowData
 import com.mason.utils.HashUtil
 import com.mason.utils.MathUtil
 import com.mason.utils.StringUtil
@@ -20,6 +19,9 @@ class SlowSearchScheme : BasicScheme {
     val pairing: Pairing = PairingFactory.getPairing("config/a.properties")
     // rho的长度
     val n_rho = MathUtil.log2(512)
+
+    val Documents = SlowData.Documents
+    val Doc2Word = SlowData.Doc2Word
 
     init {
       PairingFactory.getInstance().isUsePBCWhenPossible = true
@@ -67,12 +69,12 @@ class SlowSearchScheme : BasicScheme {
     return SlowWordCipher(first, second)
   }
 
-  override fun enc(docs: Map<String, List<String>>, sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, param: Param): List<SlowMsg2CSP> {
+  override fun enc(sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, param: Param): List<SlowMsg2CSP> {
     val results = mutableListOf<SlowMsg2CSP>()
-    docs.keys.forEach {
+    Doc2Word.keys.forEach {
       val keywords = mutableListOf<SlowWordCipher>()
       // 关键字
-      docs[it]?.forEach {
+      Doc2Word[it]?.forEach {
         val r_word = param.Zr.newRandomElement()
         keywords.add(indexGen(it, sk_do, pk_du, r_word, param))
       }
@@ -160,7 +162,7 @@ fun main(args: Array<String>) {
   println("服务器密钥对生成完毕： ${end - start}ms")
   // 加密明文和关键字
   start = System.currentTimeMillis()
-  val ciphers = slow.enc(Msg2Word, owner.sk, owner.pk, user.pk, csp.pk, param)
+  val ciphers = slow.enc(owner.sk, owner.pk, user.pk, csp.pk, param)
   end = System.currentTimeMillis()
   println("加密完毕： ${end - start}ms")
   // 查询目标
@@ -192,7 +194,7 @@ fun main(args: Array<String>) {
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
     results.forEach { key, value ->
-      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER))}")
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 50)}")
     }
     println("输入目标关键词: ")
   }

@@ -11,7 +11,7 @@ import com.hankcs.hanlp.HanLP
 import com.mason.utils.FileUtil
 
 
-class ExtractKeywords {
+class KeywordsExtractor {
   companion object {
     /**
      * 构建正向索引--采用tfidf的方式提取关键字
@@ -27,7 +27,7 @@ class ExtractKeywords {
         val doc = tfidf[it]
         if (doc != null) {
           val temp = mapSort(doc)
-          val fileName = getFileName(it)
+          val fileName = FileUtil.getFileName(it)
           if (temp.size >= MAX_KEYWORDS_COUNT) results.put(fileName, temp.subList(0, MAX_KEYWORDS_COUNT))
           else results.put(fileName, temp)
         }
@@ -71,15 +71,6 @@ class ExtractKeywords {
       return results
     }
 
-    // 获取不带文件夹和后缀的文件名
-    fun getFileName(filename: String): String {
-      if (filename.indexOf("\\") == -1) return ""
-      if (filename.indexOf(".") == -1) return ""
-      val start = filename.lastIndexOf("\\")
-      val end = filename.lastIndexOf(".")
-      return filename.substring(start + 1, end)
-    }
-
     /**
      * 构建正向索引--采用TextRank的方式提取关键字
      * @param path 文档所在的文件夹路径
@@ -89,7 +80,7 @@ class ExtractKeywords {
       val files = FileUtil.readDirs(path)
       files.forEach {
         val content = FileUtil.readFiles(it)
-        val fileName = getFileName(it)
+        val fileName = FileUtil.getFileName(it)
         val keywords = HanLP.extractKeyword(content, MAX_KEYWORDS_COUNT)
         results.put(fileName, keywords)
       }
@@ -120,7 +111,7 @@ class ExtractKeywords {
 @Throws(IOException::class)
 fun main(args: Array<String>) {
   val path = ORIGINAL_FILES_DIC_PATH
-  val results = ExtractKeywords.invertedIndexByTextRank(path)
+  val results = KeywordsExtractor.invertedIndexByTextRank(path)
   results.forEach { key, value ->
     println("$key --> $value")
   }

@@ -21,6 +21,9 @@ class FastSearchScheme : BasicScheme {
     // rho的长度
     val n_rho = MathUtil.log2(PRIME_LENGTH)
 
+    val Documents = FastData.Documents
+    val Word2Doc = FastData.Word2Doc
+
     init {
       PairingFactory.getInstance().isUsePBCWhenPossible = true
     }
@@ -129,9 +132,9 @@ class FastSearchScheme : BasicScheme {
   }
 
   // 加密
-  override fun enc(docs: Map<String, String>, words: Map<String, List<String>>, sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, structure: Structure, param: Param): FastCipher2CSP {
-    val docCiphers = docEnc(docs, pk_do, pk_du, pk_csp, param)
-    val wordsCiphers = strucEnc(words, sk_do, pk_du, structure, param)
+  override fun enc(sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, structure: Structure, param: Param): FastCipher2CSP {
+    val docCiphers = docEnc(Documents, pk_do, pk_du, pk_csp, param)
+    val wordsCiphers = strucEnc(Word2Doc, sk_do, pk_du, structure, param)
     return FastCipher2CSP(docCiphers, mapOf(pk_do to wordsCiphers))
   }
 
@@ -265,7 +268,7 @@ fun main(args: Array<String>) {
   println("结构初始化完毕： ${end - start}ms")
   // 加密明文和关键字
   start = System.currentTimeMillis()
-  val ciphers = fast.enc(Documents, Word2Doc, owner.sk, owner.pk, user.pk, csp.pk, structure, param)
+  val ciphers = fast.enc(owner.sk, owner.pk, user.pk, csp.pk, structure, param)
   end = System.currentTimeMillis()
   println("加密完毕： ${end - start}ms")
   // 查询目标
@@ -297,7 +300,7 @@ fun main(args: Array<String>) {
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
     results.forEach { key, value ->
-      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER))}")
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 50)}")
     }
     println("输入目标关键词: ")
   }
