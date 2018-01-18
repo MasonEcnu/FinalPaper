@@ -4,6 +4,7 @@
 build
 data/*
 /data/*
+/data/
 
 ### STS ###
 .apt_generated
