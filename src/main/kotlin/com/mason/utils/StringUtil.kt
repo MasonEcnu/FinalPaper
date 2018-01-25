@@ -197,7 +197,8 @@ class StringUtil {
         n < len -> source.substring(len - n, len)
         else -> {
           val sb = StringBuilder()
-          (0 until len % n + 1).forEach {
+          val count = n / len + 1
+          (0 until count).forEach {
             sb.append(source)
           }
           sb.toString().substring(0, n)
@@ -215,7 +216,7 @@ class StringUtil {
 }
 
 fun main(args: Array<String>) {
-  StringUtil.padding("haksodhkaoskdoaskodaksdjk").forEach {
-    println(it)
+  StringUtil.randomBinaryString("123", 100).let {
+    print(it.length)
   }
 }

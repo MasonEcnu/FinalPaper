@@ -1,8 +1,7 @@
-package com.mason.discarded
+package com.discarded
 
 import com.mason.constants.*
 import com.mason.models.MyFile
-import com.mason.discarded.DiscardedFileUtil
 import java.io.File
 import java.security.SecureRandom
 import java.util.*

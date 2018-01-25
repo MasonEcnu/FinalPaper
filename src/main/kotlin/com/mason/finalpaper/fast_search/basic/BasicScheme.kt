@@ -18,7 +18,7 @@ interface BasicScheme {
 
   fun trapdoor(word: String, sk_du: Element, pk_do: Element, param: Param): Element
 
-  fun search(pk_du: Element, pk_do: Element, pk_st: Element, ciphers: FastCipher2CSP, tw: Element, param: Param): Map<String, List<FastDocCipher>>
+  fun search(pk_du: Element, pk_st: Element, ciphers: FastCipher2CSP, tw: Element, param: Param): Map<String, List<FastDocCipher>>
 
   fun preDec(pk_do: Element, sk_csp: Element, ciphers: Map<String, List<FastDocCipher>>, param: Param): Map<String, List<FastDocCipher>>
 

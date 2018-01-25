@@ -24,8 +24,13 @@ class FastSearchScheme : BasicScheme {
     val Documents = FastData.Documents
     val Word2Doc = FastData.Word2Doc
 
+    var indexLists = listOf<FastIndexCipher>()
+
     init {
       PairingFactory.getInstance().isUsePBCWhenPossible = true
+//      Word2Doc.forEach { key, value ->
+//        println("$key --> ${value.size}")
+//      }
     }
   }
 
@@ -135,7 +140,9 @@ class FastSearchScheme : BasicScheme {
   override fun enc(sk_do: Element, pk_do: Element, pk_du: Element, pk_csp: Element, structure: Structure, param: Param): FastCipher2CSP {
     val docCiphers = docEnc(Documents, pk_do, pk_du, pk_csp, param)
     val wordsCiphers = strucEnc(Word2Doc, sk_do, pk_du, structure, param)
-    return FastCipher2CSP(docCiphers, mapOf(pk_do to wordsCiphers))
+    indexLists = wordsCiphers.values.toList()
+    Collections.shuffle(indexLists)
+    return FastCipher2CSP(docCiphers, mapOf(structure.pub to wordsCiphers))
   }
 
   // 生成陷门
@@ -147,11 +154,11 @@ class FastSearchScheme : BasicScheme {
   }
 
   // 检索
-  override fun search(pk_du: Element, pk_do: Element, pk_st: Element, ciphers: FastCipher2CSP, tw: Element, param: Param): Map<String, List<FastDocCipher>> {
+  override fun search(pk_du: Element, pk_st: Element, ciphers: FastCipher2CSP, tw: Element, param: Param): Map<String, List<FastDocCipher>> {
 //    val results = mutableMapOf<String, List<FastDocCipher>>()
 //    var pt = pairing.pairing(pk_st, pk_du).duplicate().mul(tw)
 //    var pt_hash = HashUtil.hash64(pt.toString())
-//    val index_map = ciphers.wordCiphers[pk_do]
+//    val index_map = ciphers.wordCiphers[pk_st]
 //    val cipher_map = ciphers.docCiphers
 //    if (index_map != null) {
 //      while (index_map.containsKey(pt_hash)) {
@@ -170,50 +177,39 @@ class FastSearchScheme : BasicScheme {
 
     val results = mutableMapOf<String, List<FastDocCipher>>()
     var pt = pairing.pairing(pk_st, pk_du).duplicate().mul(tw)
-    val index_map = ciphers.wordCiphers[pk_do]
     val cipher_map = ciphers.docCiphers
     var flag = true
-    var timer = 0
-    if (index_map != null) {
-      val indexLists = index_map.values.toList()
-      while (flag) {
-        timer++
-        indexLists.run {
-          forEach {
-            val record = it
-            if (pt.isEqual(record.first)) {
-              val cipher = cipher_map[record.doc]
-              if (cipher != null) {
-                results.put(record.doc, cipher)
-                pt = record.third.duplicate().div(pairing.pairing(record.second, param.g).duplicate().mul(tw))
-                return@run
-              }
-            } else if (indexOf(record) == size - 1) {
-              flag = false
+    while (flag) {
+      indexLists.indices.run {
+        forEach {
+          val record = indexLists[it]
+          if (pt.isEqual(record.first)) {
+            cipher_map[record.doc]?.let {
+              results.put(record.doc, it)
+              pt = record.third.duplicate().div(pairing.pairing(record.second, param.g).duplicate().mul(tw))
               return@run
             }
+          } else if (it == indexLists.size - 1) {
+            flag = false
+            return@run
           }
         }
       }
     }
-//    println(timer)
     return results
   }
 
   // 部分解密
   override fun preDec(pk_do: Element, sk_csp: Element, ciphers: Map<String, List<FastDocCipher>>, param: Param): Map<String, List<FastDocCipher>> {
     ciphers.keys.forEach {
-      val cipher = ciphers[it]
-      if (cipher != null) {
-        cipher.forEach {
-          val h5_in = pairing.pairing(pk_do, it.cm.first).duplicate().powZn(sk_csp)
-          val h5_hash = HashUtil.hash64(h5_in.toString()).toString()
-          val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
-          val rho = MathUtil.xor(it.cm.second, h5)
-          val rho_bytes = rho.toByteArray()
-          val h3_rho = param.G1.newElementFromHash(rho_bytes, 0, rho_bytes.size)
-          it.crho = pairing.pairing(h3_rho, it.cm.first)
-        }
+      ciphers[it]?.forEach {
+        val h5_in = pairing.pairing(pk_do, it.cm.first).duplicate().powZn(sk_csp)
+        val h5_hash = HashUtil.hash64(h5_in.toString()).toString()
+        val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
+        val rho = MathUtil.xor(it.cm.second, h5)
+        val rho_bytes = rho.toByteArray()
+        val h3_rho = param.G1.newElementFromHash(rho_bytes, 0, rho_bytes.size)
+        it.crho = pairing.pairing(h3_rho, it.cm.first)
       }
     }
     return ciphers
@@ -223,17 +219,14 @@ class FastSearchScheme : BasicScheme {
   override fun recovery(ciphers: Map<String, List<FastDocCipher>>, sk_du: Element, param: Param): Map<String, String> {
     val results = mutableMapOf<String, String>()
     ciphers.keys.forEach {
-      val cipher = ciphers[it]
       val sb = StringBuilder()
-      if (cipher != null) {
-        cipher.forEach {
-          val h4_in = it.crho.duplicate().powZn(sk_du)
-          val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
-          val h4 = StringUtil.randomBinaryString(h4_hash, it.cm.third.length)
-          sb.append(MathUtil.xor(h4, it.cm.third))
-        }
-        results.put(it, sb.toString())
+      ciphers[it]?.forEach {
+        val h4_in = it.crho.duplicate().powZn(sk_du)
+        val h4_hash = HashUtil.hash64(h4_in.toString()).toString()
+        val h4 = StringUtil.randomBinaryString(h4_hash, it.cm.third.length)
+        sb.append(MathUtil.xor(h4, it.cm.third))
       }
+      results.put(it, sb.toString())
     }
     return results
   }
@@ -285,7 +278,7 @@ fun main(args: Array<String>) {
     println("陷门生成完毕： ${end - start}ms")
     // 关键字检索
     start = System.currentTimeMillis()
-    val search_results = fast.search(user.pk, owner.pk, structure.pub, ciphers, tw, param)
+    val search_results = fast.search(user.pk, structure.pub, ciphers, tw, param)
     end = System.currentTimeMillis()
     println("关键字检索完毕： ${end - start}ms")
     // 部分解密
@@ -300,8 +293,9 @@ fun main(args: Array<String>) {
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
     results.forEach { key, value ->
-      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 50)}")
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 20)}")
     }
+    println("结果总数： ${results.size}")
     println("输入目标关键词: ")
   }
 }

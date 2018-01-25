@@ -1,4 +1,4 @@
-package com.mason.discarded
+package com.discarded
 
 import com.mason.constants.DECRYPTED_FILES_DIC_PATH
 import com.mason.constants.FolderType
@@ -6,8 +6,6 @@ import com.mason.constants.SPLICED_FILES_DIC_PATH
 import com.mason.models.MyFile
 import com.mason.utils.StringUtil
 import java.io.*
-import java.nio.charset.Charset
-import java.util.ArrayList
 
 /**
  * 文件读取和写入工具类
@@ -104,7 +102,7 @@ class DiscardedFileUtil {
     }
 
     fun splice(from: String, to: String, folderType: FolderType) {
-      val sources = DiscardedFileUtil.readFolderOrFile(from, folderType)
+      val sources = readFolderOrFile(from, folderType)
       val map = mutableMapOf<String, MyFile>()
       sources.forEach<MyFile> {
         it.name = it.name.substring(0, it.name.indexOfFirst { c -> c == '_' })

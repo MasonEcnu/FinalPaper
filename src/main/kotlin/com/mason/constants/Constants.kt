@@ -16,7 +16,7 @@ const val AES_PADDING = "AES/CBC/PKCS5Padding"
 const val CHARS = " !\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 const val CHARS_LENGTH = CHARS.length
 // 最大文件长度
-const val MAX_FILE_LENGTH = 10
+const val MAX_FILE_LENGTH = 2500
 
 // 素数p的位数
 const val PRIME_LENGTH = 512
@@ -32,5 +32,13 @@ const val SEPARATOR = " "
 // 终止符
 const val STOP_CHARACTER = "#.#"
 
-// 每个文件最多的关键字个数
-const val MAX_KEYWORDS_COUNT = 20
+// 总关键字个数
+const val MAX_KEYWORDS_COUNT_TOTAL = 1000
+// 单个文件提取的关键字个数
+const val MAX_KEYWORDS_COUNT_SINGLE = 5
+// 正向索引路径
+const val FORWARD_INDEX_PATH = "data\\index\\forward.txt"
+// 倒排索引路径
+const val INVERTED_INDEX_PATH = "data\\index\\inverted.txt"
+// 测试文件
+const val TEST_FILES_DIC_PATH: String = "data\\temp"

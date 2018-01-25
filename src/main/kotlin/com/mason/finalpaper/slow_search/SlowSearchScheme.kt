@@ -39,11 +39,11 @@ class SlowSearchScheme : BasicScheme {
   override fun msgEnc(doc_id: String, doc: String, pk_do: Element, pk_du: Element, pk_csp: Element, r: Element, param: Param): MutableList<SlowDocCipher> {
     val docs = StringUtil.padding(doc + STOP_CHARACTER)
     val results = mutableListOf<SlowDocCipher>()
+    val rho = StringUtil.randomBinaryString(n_rho)
     docs.forEach {
       // 1. 计算u1
       val u1 = param.g.duplicate().powZn(r)
       // 2.计算u2
-      val rho = StringUtil.randomBinaryString(n_rho)
       val h5_in = pairing.pairing(pk_do, pk_csp).duplicate().powZn(r)
       val h5_hash = HashUtil.hash64(h5_in.toString()).toString()
       val h5 = StringUtil.randomBinaryString(h5_hash, n_rho)
@@ -79,6 +79,7 @@ class SlowSearchScheme : BasicScheme {
         keywords.add(indexGen(it, sk_do, pk_du, r_word, param))
       }
       val r_doc = param.Zr.newRandomElement()
+      Collections.shuffle(keywords)
       results.add(SlowMsg2CSP(msgEnc(it, Documents[it] ?: "", pk_do, pk_du, pk_csp, r_doc, param), keywords))
     }
     return results
@@ -93,13 +94,18 @@ class SlowSearchScheme : BasicScheme {
 
   override fun search(pk_du: Element, ciphers: List<SlowMsg2CSP>, tw: Element, param: Param): List<SlowMsg2CSP> {
     val results = mutableListOf<SlowMsg2CSP>()
-    ciphers.forEach {
-      val cipher = it
-      cipher.wordCiphers.forEach {
-        val left = pairing.pairing(it.second, param.g)
-        val right = pairing.pairing(it.first, pk_du)
-        if (tw.isEqual(right.duplicate().div(left))) {
-          results.add(cipher)
+    ciphers.indices.forEach {
+      val cipher = ciphers[it]
+      val wordCiphers = cipher.wordCiphers
+      wordCiphers.indices.run {
+        forEach {
+          val left = pairing.pairing(wordCiphers[it].second, param.g)
+          val right = pairing.pairing(wordCiphers[it].first, pk_du)
+          val midVar = right.duplicate().div(left)
+          if (tw.isEqual(midVar)) {
+            results.add(cipher)
+            return@run
+          }
         }
       }
     }
@@ -194,7 +200,7 @@ fun main(args: Array<String>) {
     println("完全解密完毕： ${end - start}ms")
     println("解密结果：")
     results.forEach { key, value ->
-      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 50)}")
+      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 20)}")
     }
     println("输入目标关键词: ")
   }
