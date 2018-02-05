@@ -11,6 +11,8 @@ data class SpksCipher(val cm: Triple<Element, String, String>, val cwk: MutableL
 
 data class SpchsCipher(val first: Element, val second: Element, val third: Element, val doc: String)
 
+data class PeksCipher(val doc: String, val cwk: MutableList<Pair<Element, String>>)
+
 data class Structure(val pri: MutableMap<Element, MutableList<MutableMap<String, Element>>>, val pub: Element)
 
 data class KeywordNode(val keyword: String, val idf: Double)

@@ -101,8 +101,8 @@ class SlowSearchScheme : BasicScheme {
         forEach {
           val left = pairing.pairing(wordCiphers[it].second, param.g)
           val right = pairing.pairing(wordCiphers[it].first, pk_du)
-          val midVar = right.duplicate().div(left)
-          if (tw.isEqual(midVar)) {
+          val leftVar = left.duplicate().mul(tw)
+          if (leftVar.isEqual(right)) {
             results.add(cipher)
             return@run
           }
@@ -188,20 +188,21 @@ fun main(args: Array<String>) {
     val search_results = slow.search(user.pk, ciphers, tw, param)
     end = System.currentTimeMillis()
     println("关键字检索完毕： ${end - start}ms")
-    // 部分解密
-    start = System.currentTimeMillis()
-    val pre_results = slow.preDec(owner.pk, csp.sk, search_results, param)
-    end = System.currentTimeMillis()
-    println("部分解密完毕： ${end - start}ms")
-    // 完全解密
-    start = System.currentTimeMillis()
-    val results = slow.recovery(pre_results, user.sk, param)
-    end = System.currentTimeMillis()
-    println("完全解密完毕： ${end - start}ms")
-    println("解密结果：")
-    results.forEach { key, value ->
-      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 20)}")
-    }
+    println("结果总数：${search_results.size}")
+//    // 部分解密
+//    start = System.currentTimeMillis()
+//    val pre_results = slow.preDec(owner.pk, csp.sk, search_results, param)
+//    end = System.currentTimeMillis()
+//    println("部分解密完毕： ${end - start}ms")
+//    // 完全解密
+//    start = System.currentTimeMillis()
+//    val results = slow.recovery(pre_results, user.sk, param)
+//    end = System.currentTimeMillis()
+//    println("完全解密完毕： ${end - start}ms")
+//    println("解密结果：")
+//    results.forEach { key, value ->
+//      println("$key --> ${value.substring(0, value.indexOf(STOP_CHARACTER)).substring(0, 20)}")
+//    }
     println("输入目标关键词: ")
   }
 }
